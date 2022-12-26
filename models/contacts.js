@@ -1,81 +1,40 @@
-const fs = require('fs/promises');
-const path = require('path');
-const { nanoid } = require('nanoid');
-
-const contactsList = path.join(__dirname, './contacts.json');
-
+const Contacts = require("../db/contactsSchema")
 
 const listContacts = async () => {
-  const result = await fs.readFile(contactsList);
-  return JSON.parse(result);
+  const result = Contacts.find();
+  return result
 }
 
 const getContactById = async (contactId) => {
-  const contacts = await listContacts();
-  const result = contacts.find(item => item.id === contactId);
-  
-  return result || null;
+  return Contacts.findOne({ _id: contactId });
 }
 
 const removeContact = async (contactId) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex(item => item.id === contactId)
-  if (index === -1) {
+  const result = await Contacts.findByIdAndRemove({ _id: contactId });
+  if (!result) {
     return null;
   }
-  contacts.splice(index, 1);
-  await fs.writeFile(contactsList, JSON.stringify(contacts, null, 2));
+  return result;
 }
 
-const addContact = async ({name, email, phone}) => {
-  const contacts = await listContacts();
-  const newContact = {
-    id: nanoid(5),
-    name,
-    email,
-    phone,
-  };
-  contacts.push(newContact);
-  await fs.writeFile(contactsList, JSON.stringify(contacts, null, 2));
-  return newContact;
+const newContact = async ({ name, email, phone }) => {
+  console.log({ name, email, phone });
+  return (await Contacts.create({ name, email, phone }));
 }
 
 const updateContact = async (contactId, body) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex(item => item.id === contactId)
-  if (index === -1) {
-    return null;
-  }
-  contacts[index] = { contactId, ...body };
-  await fs.writeFile(contactsList, JSON.stringify(contacts, null, 2));
-  return contacts[index];
-  // let filteredContact = null;
-  // const putContact = {
-  //   id: contactId,
-  //   name: body.name,
-  //   email: body.email,
-  //   phone: body.phone
-  // };
+  return Contacts.findByIdAndUpdate({ _id: contactId }, body, { new: true });
+}
 
-  // contacts.forEach(contact => {
-  //   if (contact.id === contactId) {
-  //     contact.name = body.name;
-  //     contact.email = body.email;
-  //     contact.phone = body.phone;
-  //     filteredContact = contact.id;
-  //   };
-  // });
-  
-  // if (filteredContact !== null) {
-  //   return putContact;
-  // };
-  // return filteredContact;
+const addStastus = async (contactId, body) => {
+  return Contacts.findByIdAndUpdate({ _id: contactId }, body, { new: true });
 }
 
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
-  addContact,
+  newContact,
   updateContact,
+  addStastus,
 }

@@ -9,7 +9,6 @@ const {connection} = require("./db/connection")
 const PORT = process.env.PORT || 3000;
 // const uriDb = process.env.DB_HOST;
 
-// const { connection } = require('mongoose')
 const app = require('./app')
 
 const start = async() => {
@@ -17,16 +16,13 @@ const start = async() => {
     await connection();
 
     app.listen(PORT, () => {
-    console.log(`Server running. Use our API on port: ${PORT}`)
+      console.log(`Database connection successful`);
 })
   }
   catch (error) {
-    console.log(`Server not running. Error message: ${error.message}`)
+    console.log(`Server not running. Error message: ${error.message}`);
+    process.exit(1);
   }
 }
 
-start()
-
-
-
-//J9VtMyVTS252QPf
+start();
