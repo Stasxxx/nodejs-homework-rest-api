@@ -61,9 +61,20 @@ const logout = async (req, res) => {
     res.status(204).json()
 }
 
+const changeSubscription = async(req, res) => {
+    const { _id } = req.user;
+    // const { subscription } = req.params;
+    const result = await User.findByIdAndUpdate(_id, req.body, {new: true});
+    if (!result) {
+        throw HttpError(404)
+    };
+    res.json({subscription: result.subscription});
+}
+
 module.exports = {
     register: ctrlWrapper(register),
     login: ctrlWrapper(login),
     getCurrent: ctrlWrapper(getCurrent),
     logout,
+    changeSubscription: ctrlWrapper(changeSubscription),
 };
