@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
+const fs = require("fs/promises");
+const path = require("path");
 
 const { User } = require("../models/user");
 
@@ -74,10 +76,29 @@ const changeSubscription = async(req, res) => {
     res.json({subscription: result.subscription});
 }
 
+const avatarsDir = path.join(__dirname, "../", "public", "avatars")
+const updateAvatar = async (req, res) => {
+    const { _id } = req.user;
+    const { path: tempUpload, filename } = req.file;
+    console.log(req.file)
+    const newFileName = `${_id}_${filename}`
+    const resultUpload = path.join(avatarsDir, newFileName);
+    await fs.rename(tempUpload, resultUpload);
+
+    const avatarURL = path.join("avatars", filename);
+    await User.findByIdAndUpdate(_id, { avatarURL });
+
+    res.json({
+        avatarURL,
+    })
+}
+
+
 module.exports = {
     register: ctrlWrapper(register),
     login: ctrlWrapper(login),
     getCurrent: ctrlWrapper(getCurrent),
-    logout,
+    logout: ctrlWrapper(logout),
     changeSubscription: ctrlWrapper(changeSubscription),
+    updateAvatar: ctrlWrapper(updateAvatar),
 };

@@ -4,7 +4,7 @@ const ctrl = require("../../controllers/auth");
 
 const { validateBody } = require("../../middlwares/validateBody");
 
-const { authenticate } = require("../../middlwares");
+const { authenticate, upload } = require("../../middlwares");
 
 const { schemas } = require("../../models/user")
 
@@ -18,6 +18,8 @@ router.get("/current", authenticate, ctrl.getCurrent);
 
 router.post("/logout", authenticate, ctrl.logout);
 
-router.patch("/users",authenticate,validateBody(schemas.subscriptionShema), ctrl.changeSubscription)
+router.patch("/users", authenticate, validateBody(schemas.subscriptionShema), ctrl.changeSubscription)
+
+router.patch("/avatars", authenticate, upload.single("avatar"), ctrl.updateAvatar)
 
 module.exports = router;
