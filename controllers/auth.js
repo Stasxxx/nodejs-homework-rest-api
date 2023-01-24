@@ -77,9 +77,8 @@ const verifyEmail = async (req, res) => {
 
     await sendEmail(verifyEmail);
 
-    res.status(201).json({
-        email: user.email,
-        subscription: user.subscription,
+    res.status(200).json({
+        message: "Verification email sent"
     });
 }
 
